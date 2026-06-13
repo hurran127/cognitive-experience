@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노인 인지장애 체험 교육 — 사회복무요원용</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
+.app { max-width: 600px; margin: 0 auto; padding: 1.5rem 1rem; }
+.screen { display: none; }
+.screen.active { display: block; }
+.progress-bar { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #ddd; }
+.dot.active { background: #1a1a1a; }
+.dot.done { background: #888; }
+.badge { display: inline-block; font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 500; margin-bottom: 0.75rem; }
+.badge-intro { background: #e8f0fe; color: #1a56db; }
+.badge-warn { background: #fff3cd; color: #92640d; }
+.badge-info { background: #e1f5ee; color: #0a6640; }
+.badge-done { background: #d4edda; color: #155724; }
+h1 { font-size: 26px; font-weight: 700; line-height: 1.3; margin-bottom: 0.75rem; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 0.75rem; }
+h3 { font-size: 15px; font-weight: 600; margin-bottom: 0.4rem; }
+p { font-size: 15px; line-height: 1.7; color: #444; }
+.card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e8; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+.card-warn { border-left: 4px solid #f0ad4e; border-radius: 0 12px 12px 0; }
+.card-info { border-left: 4px solid #28a745; border-radius: 0 12px 12px 0; }
+.btn { padding: 11px 22px; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #1a1a1a; transition: background 0.15s; }
+.btn:hover { background: #f0f0f0; }
+.btn.primary { background: #1a1a1a; color: #fff; border-color: transparent; }
+.btn.primary:hover { opacity: 0.85; }
+.btn.full { width: 100%; margin-top: 0.75rem; }
+.btn-row { display: flex; gap: 10px; margin-top: 1.25rem; }
+.sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.25rem 0; }
+.sym-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; text-align: center; }
+.sym-icon { font-size: 32px; margin-bottom: 8px; }
+.tremor-zone { background: #fafafa; border: 1px solid #e8e8e8; border-radius: 12px; padding: 2.5rem 1rem; text-align: center; margin: 1rem 0; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; overflow: hidden; }
+#shaky-btn { padding: 14px 36px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; background: #1a1a1a; color: #fff; border: none; }
+.result-tag { font-size: 13px; padding: 7px 16px; border-radius: 8px; font-weight: 500; display: inline-block; }
+.result-ok { background: #d4edda; color: #155724; }
+.result-ng { background: #f8d7da; color: #721c24; }
+.level-row { display: flex; gap: 8px; justify-content: center; margin: 0.5rem 0; }
+.level-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #ccc; background: #fff; font-size: 13px; cursor: pointer; color: #555; }
+.level-btn.sel { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.stat-row { display: flex; gap: 10px; margin: 0.75rem 0; }
+.stat-card { flex: 1; background: #f5f5f5; border-radius: 8px; padding: 0.75rem; text-align: center; }
+.stat-val { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.stat-lbl { font-size: 12px; color: #888; margin-top: 2px; }
+.write-target-box { background: #e8f0fe; border-radius: 8px; padding: 0.75rem; text-align: center; margin-bottom: 0.75rem; }
+.write-target-word { font-size: 32px; font-weight: 700; color: #1a56db; letter-spacing: 6px; }
+.canvas-wrap { border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; margin-bottom: 0.75rem; position: relative; overflow: hidden; }
+#write-canvas { display: block; cursor: crosshair; touch-action: none; }
+.round-badge { display: inline-block; background: #fff3cd; color: #92640d; border-radius: 20px; font-size: 12px; padding: 3px 12px; margin-bottom: 0.5rem; font-weight: 500; }
+.feedback { padding: 10px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; text-align: center; margin-bottom: 0.75rem; display: none; }
+.mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 1rem 0; }
+.mem-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 0.6rem 0.3rem; text-align: center; font-size: 14px; cursor: pointer; min-height: 56px; display: flex; align-items: center; justify-content: center; transition: background 0.15s, opacity 0.5s; user-select: none; }
+.mem-card.selected { background: #e8f0fe; border-color: #4285f4; color: #1a56db; }
+.mem-card.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.mem-card.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.mem-card.missed { background: #fff3cd; border-color: #ffc107; color: #856404; }
+.timer-big { font-size: 36px; font-weight: 700; color: #e65c00; text-align: center; margin: 0.5rem 0; }
+.score-box { text-align: center; padding: 1.5rem 0; }
+.score-num { font-size: 56px; font-weight: 700; color: #1a1a1a; }
+.reflect-list { list-style: none; padding: 0; }
+.reflect-list li { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; color: #444; line-height: 1.6; align-items: flex-start; }
+.reflect-list li:last-child { border-bottom: none; }
+.ck { color: #28a745; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="screen active" id="s0">
+  <div class="progress-bar"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <span class="badge badge-intro">사회복무요원 교육 프로그램</span>
+  <h1>노인 인지장애<br>체험 교육</h1>
+  <p>어르신들이 매일 겪는 어려움을 직접 체험하고, 더 따뜻한 돌봄을 제공하기 위한 교육입니다.</p>
+  <div class="sym-grid">
+    <div class="sym-card"><div class="sym-icon">🤝</div><h3>손떨림 / 운동장애</h3><p style="font-size:12px;">진전으로 인한 일상 동작의 어려움</p></div>
+    <div class="sym-card"><div class="sym-icon">🧠</div><h3>기억력 저하</h3><p style="font-size:12px;">단기 기억 손상으로 인한 혼란과 불안</p></div>
+  </div>
+  <p style="font-size:13px;color:#888;margin-bottom:1.25rem;">소요시간 약 8~10분 | 3개 체험 모듈</p>
+  <button class="btn primary full" onclick="goTo(1)">교육 시작하기 →</button>
+</div>
+
+<div class="screen" id="s1">
+  <div class="progress-bar"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <span class="badge badge-warn">모듈 1 — 이론</span>
+  <h2>손떨림 · 운동장애란?</h2>
+  <div class="card"><h3>📋 증상 설명</h3><p>파킨슨병, 치매 등으로 인해 손과 팔이 의지와 무관하게 떨리는 증상입니다. 숟가락 사용, 약 복용, 서명 등 사소한 일상 동작이 매우 어려워집니다.</p></div>
+  <div class="card card-warn"><h3>💬 어르신의 목소리</h3><p style="font-style:italic;">"물 한 잔 마시는 것도 쏟을까봐 무서워요. 혼자 밥 먹는 것도 창피해서 안 먹게 됐어요."</p></div>
+  <div class="card"><h3>💙 복무요원의 역할</h3>
+    <ul style="padding-left:1.2rem;font-size:14px;line-height:2.2;color:#444;">
+      <li>서두르지 않고 충분한 시간 드리기</li>
+      <li>음식·약 복용 시 조용히 보조하기</li>
+      <li>실수해도 당황하지 않는 표정 유지하기</li>
+      <li>"천천히 하세요" 말 한마디가 큰 위안</li>
+    </ul>
+  </div>
+  <div class="btn-row"><button class="btn" onclick="goTo(0)">← 이전</button><button class="btn primary" onclick="goTo(2)">체험하러 가기 →</button></div>
+</div>
+
+<div class="screen" id="s2">
+  <div class="progress-bar"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <span class="badge badge-warn">모듈 1 — 체험① 버튼 누르기</span>
+  <h2>손떨림 체험</h2>
+  <p style="margin-bottom:0.5rem;">버튼이 계속 흔들립니다. <strong>3번</strong> 클릭해보세요.</p>
+  <div style="margin-bottom:0.5rem;"><p style="font-size:13px;color:#888;margin-bottom:4px;">떨림 강도:</p>
+    <div class="level-row"><button class="level-btn sel" id="lv1" onclick="setLevel(1)">약함</button><button class="level-btn" id="lv2" onclick="setLevel(2)">보통</button><button class="level-btn" id="lv3" onclick="setLevel(3)">심함</button></div>
+  </div>
+  <div class="tremor-zone">
+    <p style="font-size:13px;color:#888;" id="t-inst">버튼을 클릭하세요 (0/3)</p>
+    <button id="shaky-btn" onclick="handleClick(event)">약 받기 💊</button>
+    <div id="t-result" style="min-height:34px;"></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-val" id="t-try">0</div><div class="stat-lbl">시도</div></div>
+    <div class="stat-card"><div class="stat-val" id="t-ok">0</div><div class="stat-lbl">성공</div></div>
+    <div class="stat-card"><div class="stat-val" id="t-rate">0%</div><div class="stat-lbl">성공률</div></div>
+  </div>
+  <div class="btn-row"><button class="btn" onclick="goTo(1)">← 이전</button><button class="btn primary" onclick="goTo(3);initWriting()">글씨쓰기 체험 →</button></div>
+</div>
+
+<div class="screen" id="s3">
+  <div class="progress-bar"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+  <span class="badge badge-warn">모듈 1 — 체험② 글씨쓰기</span>
+  <h2>손떨림 글씨쓰기</h2>
+  <p style="margin-bottom:0.75rem;">손이 떨리는 상태에서 아래 단어를 따라 써보세요. 어르신이 처방전·서명을 할 때 느끼는 어려움입니다.</p>
+  <div id="w-round-badge" class="round-badge">1번째 단어 (이름)</div>
+  <div class="write-target-box"><div class="write-target-word" id="w-target">이름</div><p style="font-size:12px;color:#888;margin-top:4px;">아래 칸에 따라 써보세요</p></div>
+  <div class="canvas-wrap"><canvas id="write-canvas" height="140"></canvas></div>
+  <div class="feedback" id="w-feedback"></div>
+  <div style="display:flex;gap:8px;margin-bottom:0.75rem;">
+    <button class="btn" onclick="clearWCanvas()" style="flex:1;">🗑 지우기</button>
+    <button class="btn primary" id="w-next-btn" onclick="submitWriting()" style="flex:2;">다음 단어 →</button>
+  </div>
+  <div id="w-done-box" style="display:none;">
+    <div class="card" style="background:#f0fdf4;border-color:#86efac;text-align:center;">
+      <p style="font-size:15px;font-weight:600;color:#166534;margin-bottom:0.25rem;">두 단어 쓰기 완료!</p>
+      <p style="font-size:13px;color:#555;">어르신들은 이 상태로 매일 서류에 서명하고 메모를 남겨야 합니다.</p>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn" onclick="goTo(2)">← 이전</button><button class="btn primary" onclick="goTo(4)">다음 모듈 →</button></div>
+</div>
+
+<div class="screen" id="s4">
+  <div class="progress-bar"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
+  <span class="badge badge-info">모듈 2 — 이론</span>
+  <h2>기억력 저하란?</h2>
+  <div class="card"><h3>📋 증상 설명</h3><p>치매 초기에는 방금 들은 말, 약 먹었는지 여부, 약속 시간 등 <em>단기 기억</em>이 먼저 손상됩니다. 같은 말을 반복하거나 낯익은 사람을 못 알아보기도 합니다.</p></div>
+  <div class="card card-info"><h3>💬 어르신의 목소리</h3><p style="font-style:italic;">"방금 뭘 가지러 왔는지 모르겠어요. 아까 밥을 먹었는지도 기억이 안 나서 자꾸 불안해져요."</p></div>
+  <div class="card"><h3>💙 복무요원의 역할</h3>
+    <ul style="padding-left:1.2rem;font-size:14px;line-height:2.2;color:#444;">
+      <li>같은 말 반복해도 처음 듣는 것처럼 응대</li>
+      <li>"그걸 왜 모르세요?" 같은 말 절대 금지</li>
+      <li>메모·달력 등 기억 보조 도구 활용 지원</li>
+      <li>불안해하실 때 차분하게 안심시켜 드리기</li>
+    </ul>
+  </div>
+  <div class="btn-row"><button class="btn" onclick="goTo(3)">← 이전</button><button class="btn primary" onclick="initMemory();goTo(5)">체험하러 가기 →</button></div>
+</div>
+
+<div class="screen" id="s5">
+  <div class="progress-bar"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
+  <span class="badge badge-info">모듈 2 — 체험</span>
+  <h2>기억력 체험</h2>
+  <div id="mem-study">
+    <p style="margin-bottom:0.5rem;">아래 단어 <strong>8개</strong>를 외우세요.</p>
+    <div class="timer-big" id="mem-timer">5</div>
+    <div class="mem-grid" id="mem-study-grid"></div>
+    <p style="font-size:12px;color:#aaa;margin-top:0.5rem;">* 치매 어르신은 이 정보가 수초 내에 흐릿해집니다</p>
+  </div>
+  <div id="mem-quiz" style="display:none;">
+    <p style="margin-bottom:0.75rem;">방금 본 단어 중 <strong>기억나는 것을 모두</strong> 고르세요.</p>
+    <div class="mem-grid" id="mem-quiz-grid"></div>
+    <button class="btn primary full" id="mem-submit" onclick="checkMemory()">제출하기</button>
+  </div>
+  <div id="mem-result" style="display:none;">
+    <div class="score-box"><p style="font-size:13px;color:#888;margin-bottom:0.25rem;">맞힌 개수</p><div class="score-num" id="mem-score">0/4</div><p style="font-size:14px;color:#555;margin-top:0.5rem;" id="mem-comment"></p></div>
+    <button class="btn primary full" onclick="goTo(6)">교육 마무리 →</button>
+  </div>
+  <div id="mem-back" style="margin-top:1rem;"><button class="btn" onclick="goTo(4)">← 이전</button></div>
+</div>
+
+<div class="screen" id="s6">
+  <div class="progress-bar"><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div></div>
+  <span class="badge badge-done">✅ 교육 완료</span>
+  <h2>오늘의 체험 돌아보기</h2>
+  <p style="margin-bottom:1rem;">어르신들은 이 어려움을 <strong>매일, 24시간</strong> 겪고 있습니다.</p>
+  <ul class="reflect-list">
+    <li><span class="ck">✓</span><span>버튼 하나 누르기가 힘들었다면, 어르신은 식사·약·이동 모든 순간이 그렇습니다.</span></li>
+    <li><span class="ck">✓</span><span>글씨 쓰기가 뜻대로 안 됐다면, 어르신은 매일 처방전·서명을 이 상태로 해야 합니다.</span></li>
+    <li><span class="ck">✓</span><span>단어 몇 개를 잊어버려도 당황했다면, 어르신은 가족 얼굴과 집 주소도 잊어버립니다.</span></li>
+    <li><span class="ck">✓</span><span>복무요원의 천천히 기다려주는 태도 하나가 어르신의 하루를 바꿀 수 있습니다.</span></li>
+  </ul>
+  <div class="card" style="margin-top:1.25rem;background:#f9f9f9;">
+    <h3 style="margin-bottom:0.75rem;">핵심 행동 원칙 3가지</h3>
+    <p style="font-size:14px;line-height:2.4;color:#1a1a1a;">1. <strong>기다리기</strong> — 재촉하지 않고 스스로 하실 때까지<br>2. <strong>존중하기</strong> — 실수를 탓하지 않고 자연스럽게<br>3. <strong>반복하기</strong> — 같은 질문도 처음처럼 성실히</p>
+  </div>
+  <button class="btn full" style="margin-top:1rem;" onclick="restartAll()">↺ 처음부터 다시 체험하기</button>
+</div>
+
+</div>
+<script>
+function goTo(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s'+n).classList.add('active');window.scrollTo(0,0);if(n===2)startTremor();else stopTremor();}
+
+var raf=null,tlv=1,tTry=0,tOk=0,tPhase=0;
+var lv={1:{a:18,f:0.12},2:{a:30,f:0.18},3:{a:48,f:0.26}};
+function setLevel(n){tlv=n;[1,2,3].forEach(i=>document.getElementById('lv'+i).classList.toggle('sel',i===n));}
+function startTremor(){stopTremor();tTry=0;tOk=0;tPhase=0;updStat();document.getElementById('t-result').innerHTML='';document.getElementById('t-inst').textContent='버튼을 클릭하세요 (0/3)';var t=0;function step(){t+=lv[tlv].f;var a=lv[tlv].a,x=Math.sin(t*3.7)*a*0.7+Math.sin(t*7.1)*a*0.3,y=Math.cos(t*4.3)*a*0.5+Math.cos(t*9.2)*a*0.25,r=Math.sin(t*2.1)*6;document.getElementById('shaky-btn').style.transform='translate('+x+'px,'+y+'px) rotate('+r+'deg)';raf=requestAnimationFrame(step);}raf=requestAnimationFrame(step);}
+function stopTremor(){if(raf){cancelAnimationFrame(raf);raf=null;}}
+function handleClick(e){if(tPhase>=3)return;tTry++;var btn=document.getElementById('shaky-btn'),rect=btn.getBoundingClientRect(),hit=Math.hypot(e.clientX-rect.left-rect.width/2,e.clientY-rect.top-rect.height/2)<rect.width/2+12,el=document.getElementById('t-result');if(hit){tOk++;tPhase++;el.innerHTML='<span class="result-tag result-ok">✓ 성공! 하지만 어르신은 이게 매 끼니마다입니다.</span>';}else{tPhase++;el.innerHTML='<span class="result-tag result-ng">✗ 실패. 의도대로 몸이 움직이지 않는 느낌, 어떠셨나요?</span>';}document.getElementById('t-inst').textContent='버튼을 클릭하세요 ('+tPhase+'/3)';updStat();if(tPhase>=3)setTimeout(function(){el.innerHTML='<span class="result-tag" style="background:#f0f0f0;color:#444;">3번 완료! 글씨쓰기 체험으로 이동하세요.</span>';},1200);}
+function updStat(){document.getElementById('t-try').textContent=tTry;document.getElementById('t-ok').textContent=tOk;document.getElementById('t-rate').textContent=tTry>0?Math.round(tOk/tTry*100)+'%':'0%';}
+
+var wWords=['이름','날짜'],wBadge=['1번째 단어 (이름)','2번째 단어 (날짜)'],wMsgs=['손이 떨려 글씨가 흔들리죠? 어르신은 서류마다 이 상태로 서명해야 합니다.','잘 쓰셨나요? 어르신은 이 상태로 처방전·동의서 등을 매번 작성해야 합니다.'];
+var wRound=0,wDrawing=false,wCvs,wCtx;
+function initWriting(){wRound=0;wCvs=document.getElementById('write-canvas');wCvs.width=wCvs.parentElement.clientWidth;wCtx=wCvs.getContext('2d');wCvs.onpointerdown=wStart;wCvs.onpointermove=wDraw;wCvs.onpointerup=function(){wDrawing=false;};wCvs.onpointerleave=function(){wDrawing=false;};document.getElementById('w-done-box').style.display='none';document.getElementById('w-next-btn').style.display='';document.getElementById('w-next-btn').textContent='다음 단어 →';setupWRound();}
+function setupWRound(){document.getElementById('w-target').textContent=wWords[wRound];document.getElementById('w-round-badge').textContent=wBadge[wRound];document.getElementById('w-feedback').style.display='none';clearWCanvas();if(wRound===1)document.getElementById('w-next-btn').textContent='완료 ✓';}
+function clearWCanvas(){if(!wCtx)return;wCtx.clearRect(0,0,wCvs.width,wCvs.height);}
+function getOff(){var t=Date.now()/1000,a=8;return{x:Math.sin(t*11.3)*a+Math.sin(t*17.7)*a*0.4,y:Math.cos(t*9.1)*a*0.6+Math.cos(t*23.5)*a*0.3};}
+function getCPos(e){var rect=wCvs.getBoundingClientRect(),sx=wCvs.width/rect.width,sy=wCvs.height/rect.height,off=getOff();return{x:(e.clientX-rect.left)*sx+off.x,y:(e.clientY-rect.top)*sy+off.y};}
+function wStart(e){e.preventDefault();wDrawing=true;var p=getCPos(e);wCtx.beginPath();wCtx.moveTo(p.x,p.y);}
+function wDraw(e){if(!wDrawing)return;e.preventDefault();var p=getCPos(e);wCtx.lineTo(p.x,p.y);wCtx.strokeStyle='#1a1a1a';wCtx.lineWidth=2.5;wCtx.lineCap='round';wCtx.lineJoin='round';wCtx.stroke();}
+function hasDrawn(){var d=wCtx.getImageData(0,0,wCvs.width,wCvs.height).data;for(var i=3;i<d.length;i+=4)if(d[i]>10)return true;return false;}
+function submitWriting(){if(!hasDrawn()){var fb=document.getElementById('w-feedback');fb.style.display='block';fb.style.background='#fff3cd';fb.style.color='#92640d';fb.textContent='✏️ 먼저 단어를 써보세요!';return;}var fb=document.getElementById('w-feedback');fb.style.display='block';fb.style.background='#d4edda';fb.style.color='#155724';fb.textContent='✓ '+wMsgs[wRound];if(wRound===0){document.getElementById('w-next-btn').disabled=true;setTimeout(function(){wRound=1;setupWRound();document.getElementById('w-next-btn').disabled=false;},1800);}else{document.getElementById('w-next-btn').style.display='none';setTimeout(function(){fb.style.display='none';document.getElementById('w-done-box').style.display='block';},1800);}}
+
+var allW=['사과','지하철','파란색','신발','할머니','약봉지','점심','의자','열쇠','달력','손수건','창문','버스','노란색','우산','책상'],studyW=[],correctS=new Set(),selectedS=new Set(),mTimer=null;
+function initMemory(){selectedS=new Set();studyW=[...allW].sort(function(){return Math.random()-0.5;}).slice(0,8);correctS=new Set(studyW.slice(0,4));document.getElementById('mem-study').style.display='block';document.getElementById('mem-quiz').style.display='none';document.getElementById('mem-result').style.display='none';document.getElementById('mem-back').style.display='block';var g=document.getElementById('mem-study-grid');g.innerHTML='';studyW.forEach(function(w){var d=document.createElement('div');d.className='mem-card';d.textContent=w;g.appendChild(d);});var sec=5;document.getElementById('mem-timer').textContent=sec;if(mTimer)clearInterval(mTimer);mTimer=setInterval(function(){sec--;document.getElementById('mem-timer').textContent=sec;if(sec<=0){clearInterval(mTimer);fadeQuiz();}},1000);}
+function fadeQuiz(){document.querySelectorAll('#mem-study-grid .mem-card').forEach(function(c,i){setTimeout(function(){c.style.opacity='0';},i*120);});setTimeout(function(){document.getElementById('mem-study').style.display='none';document.getElementById('mem-back').style.display='none';document.getElementById('mem-quiz').style.display='block';var dist=allW.filter(function(w){return!studyW.includes(w);}).sort(function(){return Math.random()-0.5;}).slice(0,4);var qw=[...studyW.slice(0,4),...dist].sort(function(){return Math.random()-0.5;});var g=document.getElementById('mem-quiz-grid');g.innerHTML='';qw.forEach(function(w){var d=document.createElement('div');d.className='mem-card';d.textContent=w;d.onclick=function(){if(selectedS.has(w)){selectedS.delete(w);d.classList.remove('selected');}else{selectedS.add(w);d.classList.add('selected');}};g.appendChild(d);});document.getElementById('mem-submit').style.display='';},1800);}
+function checkMemory(){var correct=0;document.querySelectorAll('#mem-quiz-grid .mem-card').forEach(function(el){var w=el.textContent,isC=correctS.has(w),sel=selectedS.has(w);el.onclick=null;if(sel&&isC){el.className='mem-card correct';correct++;}else if(sel&&!isC){el.className='mem-card wrong';}else if(!sel&&isC){el.className='mem-card missed';}});document.getElementById('mem-submit').style.display='none';setTimeout(function(){document.getElementById('mem-quiz').style.display='none';document.getElementById('mem-result').style.display='block';document.getElementById('mem-score').textContent=correct+'/4';var c=['많이 어려우셨죠? 이게 어르신들의 매일입니다.','꽤 어려웠을 거예요. 어르신은 이게 매일입니다.','잘 하셨어요! 하지만 어르신은 더 많이 사라집니다.','완벽해요! 하지만 어르신에겐 이 단어들도 흐릿합니다.'];document.getElementById('mem-comment').textContent=c[Math.min(correct,3)];},1500);}
+
+function restartAll(){stopTremor();if(mTimer)clearInterval(mTimer);tTry=0;tOk=0;tPhase=0;wRound=0;goTo(0);}
+</script>
+</body>
+</html>
